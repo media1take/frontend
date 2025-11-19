@@ -54,6 +54,9 @@ const stopBtn = document.getElementById('stopBtn');
 const reallyBtn = document.getElementById('reallyBtn');
 const sendBtn = document.getElementById('sendBtn');
 const onlineEl = document.getElementById('onlineCount');
+const blockBtn = document.getElementById('mod-block');
+const reportBtn = document.getElementById('mod-report');
+let partnerId = null;
 
 // Start local video stream
 async function startLocal() {
@@ -171,7 +174,9 @@ function setupSocketListeners() {
       stopBtn.classList.remove('danger');
       stopBtn.classList.add('primary');
     }
-    
+    // Show moderation icons
+    if (blockBtn) blockBtn.classList.remove('hide');
+    if (reportBtn) reportBtn.classList.remove('hide');
     addSystemMessage('Connected to a stranger!');
   });
 
@@ -218,6 +223,8 @@ function setupSocketListeners() {
   });
 
   socket.on('newMessageToClient', (data) => {
+    // Capture partnerId from first stranger message
+    if (!partnerId && data.id !== socket.id) partnerId = data.id;
     console.log('[video] Message from', data.id === socket.id ? 'me' : 'stranger');
     addMessage(data.msg, data.id === socket.id);
   });
@@ -264,33 +271,14 @@ function setupEventListeners() {
     console.error('[video] Start button not found!');
   }
 
-  // Stop button - show Really? confirmation
+  // Stop button - show exit modal if connected, else show Really?
   if (stopBtn) {
     stopBtn.addEventListener('click', () => {
       console.log('[video] Stop clicked - isConnected=', isConnected);
-      // If currently connected, this button acts as 'Next' (blue): disconnect and immediately find another
       if (isConnected) {
-        if (socket) socket.emit('stop');
-        // reset local UI state
-        resetVideoChat();
-        // start searching again after a short delay
-        setTimeout(async () => {
-          if (!localStream) await startLocal();
-          if (socket && socket.connected) {
-            // show searching red Stop button while queuing
-            if (stopBtn) {
-              stopBtn.textContent = 'Stop';
-              stopBtn.classList.remove('primary');
-              stopBtn.classList.add('danger');
-              stopBtn.style.display = 'block';
-            }
-            if (startBtn) startBtn.style.display = 'none';
-            socket.emit('find', { interests: [], mode: 'video' });
-          }
-        }, 250);
+        openExitModal();
         return;
       }
-
       // Not connected: show confirmation (Really?)
       stopBtn.style.display = 'none';
       if (reallyBtn) reallyBtn.style.display = 'block';
@@ -306,6 +294,57 @@ function setupEventListeners() {
       setTimeout(() => window.location.href = '/', 300);
     });
   }
+
+  // Moderation icon handlers (in navbar)
+  if (blockBtn) {
+    blockBtn.addEventListener('click', () => {
+      if (!partnerId) {
+        alert('No partner identified yet to block.');
+        return;
+      }
+      const blocked = JSON.parse(localStorage.getItem('blockedUsers') || '[]');
+      if (!blocked.includes(partnerId)) {
+        blocked.push(partnerId);
+        localStorage.setItem('blockedUsers', JSON.stringify(blocked));
+      }
+      if (socket && socket.connected) {
+        socket.emit('block', { id: partnerId });
+      }
+      if (socket && socket.connected) socket.emit('stop');
+      closeExitModal();
+      resetVideoChat();
+      setTimeout(() => {
+        if (socket && socket.connected) socket.emit('find', { interests: [], mode: 'video' });
+      }, 300);
+    });
+  }
+
+  if (reportBtn) {
+    reportBtn.addEventListener('click', () => {
+      if (!partnerId) {
+        alert('No partner identified yet to report.');
+        return;
+      }
+      const reason = window.prompt('Please briefly describe the reason for reporting this user (optional):');
+      const reports = JSON.parse(localStorage.getItem('reports') || '[]');
+      reports.push({ id: partnerId, reason: reason || '', date: new Date().toISOString() });
+      localStorage.setItem('reports', JSON.stringify(reports));
+      if (socket && socket.connected) socket.emit('report', { id: partnerId, reason });
+      alert('Thank you — the user has been reported. You will be connected to someone else.');
+      if (socket && socket.connected) socket.emit('stop');
+      closeExitModal();
+      resetVideoChat();
+      setTimeout(() => {
+        if (socket && socket.connected) socket.emit('find', { interests: [], mode: 'video' });
+      }, 300);
+    });
+  }
+
+  // Exit modal handlers
+  document.getElementById('modal-send')?.addEventListener('click', modalSendHandler);
+  document.getElementById('modal-yes')?.addEventListener('click', modalYesHandler);
+  document.getElementById('modal-close')?.addEventListener('click', closeExitModal);
+  document.getElementById('modal-backdrop')?.addEventListener('click', closeExitModal);
 
   // Send message button
   if (sendBtn) {
@@ -418,6 +457,52 @@ function hideTypingIndicator() {
   if (el) el.remove();
 }
 
+// Exit modal helpers
+function openExitModal() {
+  const modal = document.getElementById('exit-modal');
+  if (!modal) return;
+  modal.classList.remove('hide');
+  modal.setAttribute('aria-hidden', 'false');
+  const ta = document.getElementById('exit-note');
+  if (ta) ta.focus();
+}
+
+function closeExitModal() {
+  const modal = document.getElementById('exit-modal');
+  if (!modal) return;
+  modal.classList.add('hide');
+  modal.setAttribute('aria-hidden', 'true');
+  const ta = document.getElementById('exit-note');
+  if (ta) ta.value = '';
+}
+
+function modalSendHandler(e) {
+  e.preventDefault();
+  const ta = document.getElementById('exit-note');
+  const val = ta ? ta.value.trim() : '';
+  if (val && socket && room) {
+    socket.emit('doneTyping');
+    socket.emit('newMessageToServer', val);
+    addMessage(val, true);
+  }
+  if (socket && socket.connected) socket.emit('stop');
+  closeExitModal();
+  resetVideoChat();
+  setTimeout(() => {
+    if (socket && socket.connected) socket.emit('find', { interests: [], mode: 'video' });
+  }, 300);
+}
+
+function modalYesHandler(e) {
+  e.preventDefault();
+  if (socket && socket.connected) socket.emit('stop');
+  closeExitModal();
+  resetVideoChat();
+  setTimeout(() => {
+    if (socket && socket.connected) socket.emit('find', { interests: [], mode: 'video' });
+  }, 300);
+}
+
 // Reset video chat state
 function resetVideoChat() {
   console.log('[video] Resetting video chat state');
@@ -431,8 +516,16 @@ function resetVideoChat() {
     startBtn.disabled = false;
     startBtn.style.display = 'block';
   }
-  if (stopBtn) stopBtn.style.display = 'none';
+  if (stopBtn) {
+    stopBtn.style.display = 'none';
+    stopBtn.textContent = 'Stop';
+    stopBtn.classList.remove('primary');
+    stopBtn.classList.add('danger');
+  }
   if (reallyBtn) reallyBtn.style.display = 'none';
+  if (blockBtn) blockBtn.classList.add('hide');
+  if (reportBtn) reportBtn.classList.add('hide');
+  partnerId = null;
   
   // Close peer connection
   if (pc) {

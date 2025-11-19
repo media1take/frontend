@@ -6,26 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Omegle - Talk to Strangers</title>
     <link rel="stylesheet" href="/home/Omegle.css" type="text/css">
-    <link rel="shortcut icon" href="/home/omgelelogocroped2.jpg" type="image/x-icon">
+    <link rel="shortcut icon" href="/img/logo.png" type="image/x-icon">
 </head>
 <body>
     <!-- Header -->
     <header class="header" role="banner" aria-label="Top header">
         <div class="header-left">
             <a href="/" class="brand logo">
-                <img src="/home/omgelelogocroped.png" alt="Omegle Logo">
+                <img src="/img/omgelelogocroped.png" alt="Omegle Logo">
             </a>
             <div class="description">
-                <img src="/home/tagline.png" alt="Talk to Strangers">
+                <img src="/img/tagline.png" alt="Talk to Strangers">
             </div>
         </div>
         <div class="header-right">
             <div class="social-links">
                 <a href="/community" title="Visit our community">
-                    <img src="/home/fbsharebtn.png" alt="Community">
+                    <img src="/img/fbsharebtn.png" alt="Community">
                 </a>
                 <a href="/community" title="Visit our community">
-                    <img src="/home/tweetbtn.png" alt="Community">
+                    <img src="/img/tweetbtn.png" alt="Community">
                 </a>
             </div>
             <a href="/community" class="nav-link">Community</a>
@@ -47,7 +47,7 @@
                 <small>online now</small>
             </div>
         </div>
-    </div>
+    </header>
 
     <!-- Main Content -->
     <div class="remaining">
@@ -56,7 +56,7 @@
                     <p><strong>You don't need an app to use Omegle on your phone or tablet! The web site works great on mobile.</strong></p>
                 </div>
                 <div class="photo">
-                    <img src="/home/standwithhk.jpeg">
+                    <img src="/img/standwithhk.jpeg" alt="Stand with Hong Kong">
                 </div>
                 <div class="lefttophoto">
                     <p>Omegle is a great way to meet new friends,<br> even while practicing social distancing. When you use<br> Omegle, you are paired randomly with another person to <br>talk one-on-one. If you prefer, you can add your interests<br> and you’ll be randomly paired with someone who selected<br> some of the same interests.</p>
@@ -67,12 +67,11 @@
 
                         <strong>You must be 18+ or 13+ with parental permission and supervision to use Omegle.</strong> See our<br> <a href="/terms" target="_blank">Terms of Service</a> for more info. Parental control protections that may assist parents are commercially<br> available and you can find more info at <a href="https://www.connectsafely.org/controls/" target="_blank">https://www.connectsafely.org/controls/</a> as well as other sites.<br><br>
 
-                        Please leave Omegle and visit an <p1>adult site</p1> instead if that's what you're looking for, and you are 18 or older.</p>
+                        Please leave Omegle and visit an <span class="adult-note">adult site</span> instead if that's what you're looking for, and you are 18 or older.</p>
 
                 </div>
                 <div class="bluebox">
-                    <h2>Video is monitored. Keep it clean<img src="/home/exclamationog.png" ></h2>
-                    
+                    <h2>Video is monitored. Keep it clean <img src="/img/exclamationog.png" alt="Warning"></h2>
                 </div>
             <div class="middown">
                <div class="interest">
@@ -80,7 +79,7 @@
                    
                 <table class="talkabout">
                     <tr>
-                        <td1><label class="about">What do you wanna talk about?</label></td1>
+                        <td><label class="about">What do you wanna talk about?</label></td>
                     </tr>
                     <tr>
                         <td id="talkbox"><input type="text" style="line-height: 48px;width: 339px; height: 40px;border-radius: 5px; text-align: center;font-size: larger; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;" placeholder="Add your interest(optional)"></td>
@@ -93,7 +92,7 @@
                     <p style="padding-left: 136px;">Start chatting:</p>
                     <div class="textimg">
                         <a href="/chat" title="Start text chat">
-                            <img src="/home/textbtn.png" height="48" width="124" alt="Text chat">
+                            <img src="/img/textbtn.png" height="48" width="124" alt="Text chat">
                         </a>
                     </div>
                     <div class="ortext">
@@ -101,22 +100,22 @@
                     </div>
                     <div class="videoimg">
                         <a href="/video" title="Start video chat">
-                            <img src="/home/videobtn-enabled.png" height="48" width="124" alt="Video chat">
+                            <img src="/img/videobtn-enabled.png" height="48" width="124" alt="Video chat">
                         </a>
                     </div>
                     
                </div>
                <div class="college">
-                 <div class="playbutton">
-                    <img src="/home/blue-square-play-button.png" style="height: 25px;">
-                 </div>
+                      <div class="playbutton">
+                          <img src="/img/blue-square-play-button.png" alt="Play" style="height: 25px;">
+                      </div>
                  <div class="stdchat">
                     <p><strong>College student</strong> chat</p>
                    
                  </div>
-                 <div class="unmoded">
-                    <img src="/home/umoded.png" style="height: 25px;">
-                 </div>
+                      <div class="unmoded">
+                          <img src="/img/umoded.png" alt="Unmoderated" style="height: 25px;">
+                      </div>
 
                </div>
             </div>
@@ -187,11 +186,14 @@
         });
 
         // Language selector (placeholder for future i18n)
-        document.getElementById('langSelect').addEventListener('change', (e) => {
-            const lang = e.target.value;
-            console.log('Language selected:', lang);
-            // TODO: Implement i18n translation logic here
-        });
+        const langEl = document.getElementById('langSelect');
+        if (langEl) {
+            langEl.addEventListener('change', (e) => {
+                const lang = e.target.value;
+                console.log('Language selected:', lang);
+                // TODO: Implement i18n translation logic here
+            });
+        }
     </script>
 </body>
 </html>

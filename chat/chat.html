@@ -2,16 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <link href="/chat/chat.css" rel="stylesheet">
     <title>Omegle — Text Chat</title>
 </head>
 <body>
     <section class="navbar">
-        <a href="/" aria-label="Home"><img class="logo" src="../img/logo.png" alt="logo"></a>
+        <a href="/" aria-label="Home"><img class="logo" src="/img/logo.png" alt="logo"></a>
         <h2 class="description">Talk to strangers!</h2>
         <h2 class="online"></h2>
+        <div class="moderation" aria-hidden="false">
+            <button id="mod-block" class="mod-btn hide" title="Block user">🚫</button>
+            <button id="mod-report" class="mod-btn hide" title="Report user">⚠️</button>
+        </div>
     </section>
 
     <main class="main">
@@ -19,7 +26,7 @@
         </section>
 
         <form class="form">
-            <button type="button" class="btn start bottom-left-radius" id="start">Start</button>
+            <button type="button" class="btn start bottom-left-radius" id="start">Connect</button>
             <button type="button" class="btn bottom-left-radius hide" id="stop">Stop</button>
             <button type="button" class="btn bottom-left-radius bold hide" id="really">Really?</button>
             <textarea name="text" id="text" class="textarea" disabled></textarea>
@@ -29,6 +36,21 @@
 
     <script src="/config.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    
+    <!-- Exit confirmation modal -->
+    <div id="exit-modal" class="modal hide" role="dialog" aria-hidden="true">
+        <div class="modal-backdrop" id="modal-backdrop"></div>
+        <div class="modal-panel" role="document" aria-labelledby="exit-title">
+            <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+            <h3 id="exit-title">Are you sure you want to end this chat?</h3>
+            <textarea id="exit-note" class="exit-textarea" placeholder="Really — say something (optional)"></textarea>
+            <div class="modal-actions">
+                <button id="modal-send" class="btn">Send</button>
+                <button id="modal-yes" class="btn start">Yes</button>
+            </div>
+        </div>
+    </div>
+
     <script src='./chat.js'></script>
 </body>
 </html>

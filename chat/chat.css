@@ -7,14 +7,17 @@
 html {
     box-sizing: border-box;
     font-size: 62.5%;
+    -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape */
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 body {
-    font-family: sans-serif;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
     font-weight: 400;
     line-height: 1.6;
     background-color: #FFF7EE;
-    height: 100vh;
+        min-height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -23,14 +26,104 @@ body {
 .navbar {
     display: flex;
     align-items: center;
-    height: 12%;
+    height: 12vh; /* fixed header height on viewport */
+    min-height: 56px;
     box-shadow: 0 .2rem 1rem rgba(0, 0, 0, .1);
     background-color: white;
     padding: 1rem;
 }
 
 .logo {
-    height: 20rem;
+    height: 50rem;
+    max-height: 56px;
+    width: auto;
+    display: block;
+}
+
+/* Moderation icon container in navbar (top-right) */
+.moderation {
+    margin-left: 1rem;
+    margin-right: 0.5rem;
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+.mod-btn {
+    background: transparent;
+    border: none;
+    font-size: 2.2rem;
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+    border-radius: 6px;
+}
+
+.mod-btn:hover {
+    background: rgba(0,0,0,0.04);
+}
+
+/* Exit modal styles */
+.modal.hide { display: none; }
+.modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+}
+.modal-panel {
+    position: relative;
+    background: #fff;
+    width: 90%;
+    max-width: 520px;
+    padding: 1.4rem;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+.modal-close {
+    position: absolute;
+    right: 0.6rem;
+    top: 0.6rem;
+    border: none;
+    background: transparent;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+.modal-panel h3 {
+    margin: 0;
+    font-size: 1.6rem;
+}
+.exit-textarea {
+    min-height: 84px;
+    resize: vertical;
+    padding: 0.8rem;
+    font-size: 1.4rem;
+    border: 1px solid #e6e6e6;
+    border-radius: 8px;
+}
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+}
+.modal-actions .btn {
+    padding: 0.6rem 1.1rem;
+    font-size: 1.4rem;
+    border-radius: 8px;
+}
+.modal-actions .start {
+    background-image: linear-gradient(to bottom, #6EE7B7, #10B981) !important;
+    color: white !important;
 }
 
 .description {
@@ -53,13 +146,14 @@ body {
     padding: 1rem;
     display: flex;
     flex-direction: column;
-    height: 88%;
+    height: calc(100vh - 12vh); /* fill remaining viewport under header */
     overflow: hidden;
     pointer-events: auto;
 }
 
 .conversation {
-    height: 83%;
+    height: calc(100vh - 12vh - 17vh); /* default conversation height: viewport minus header and form */
+    min-height: 320px;
     background-color: white;
     border: 1px solid #CCCCCC;
     border-top-left-radius: 7px;
@@ -81,6 +175,27 @@ body {
 
 .chat {
     margin-bottom: .7rem;
+    display: flex;
+    gap: .6rem;
+    align-items: flex-start;
+}
+
+.chat .text {
+    display: inline-block;
+    padding: .6rem .9rem;
+    background: #f3f4f6;
+    border-radius: 12px;
+    max-width: 78%;
+    word-break: break-word;
+    font-size: 1.45rem;
+    line-height: 1.35;
+}
+
+.typing {
+    font-style: italic;
+    color: #9CA3AF;
+    text-align: center;
+    width: 100%;
 }
 
 .name {
@@ -96,7 +211,7 @@ body {
 }
 
 .form {
-    height: 17%;
+    height: 17vh; /* fixed composer height on viewport */
     margin-top: 1rem;
     display: grid;
     grid-template-columns: 15rem 1fr 15rem;
@@ -107,7 +222,7 @@ body {
 }
 
 .btn {
-    height: 100%;
+    min-height: 44px;
     background-color: white;
     font-size: 1.6rem;
     border: 1px solid #CCCCCC;
@@ -116,6 +231,7 @@ body {
     z-index: 101;
     position: relative;
     transition: opacity 0.2s ease;
+    touch-action: manipulation;
 }
 
 .btn:focus {
@@ -135,7 +251,7 @@ body {
 }
 
 .start {
-    background-image: linear-gradient(to bottom, #7EBFFF, #0581FE) !important;
+    background-image: linear-gradient(to bottom, #6EE7B7, #10B981) !important; /* green */
     color: white !important;
     font-weight: 600 !important;
     border: none !important;
@@ -153,7 +269,7 @@ body {
 }
 
 #send {
-    background-image: linear-gradient(to bottom, #7EBFFF, #0581FE) !important;
+    background-image: linear-gradient(to bottom, #C084FC, #7C3AED) !important; /* purple */
     color: white !important;
     font-weight: 600 !important;
     border: none !important;
@@ -167,6 +283,30 @@ body {
     outline: none;
 }
 
+/* Make the Stop button visually match the Send button */
+#stop {
+    background-image: linear-gradient(to bottom, #C084FC, #7C3AED) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    border: none !important;
+}
+
+#stop:hover { opacity: 0.95; }
+
+#stop:focus { outline: none; }
+
+/* Make the Really button visually match Send/Stop */
+#really {
+    background-image: linear-gradient(to bottom, #C084FC, #7C3AED) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    border: none !important;
+}
+
+#really:hover { opacity: 0.95; }
+
+#really:focus { outline: none; }
+
 .textarea {
     height: 100%;
     resize: none;
@@ -174,6 +314,9 @@ body {
     font-size: 1.6rem;
     border: 1px solid #CCCCCC;
     padding: 1rem;
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .textarea:focus {
@@ -181,11 +324,48 @@ body {
 }
 
 .hide {
-    display: none;
+    display: none !important;
 }
 
 .bold {
     font-weight: 700;
+}
+
+/* Message bubble styles (professional look) */
+.bubble {
+    display: inline-block;
+    padding: .7rem 1rem;
+    margin-bottom: .8rem;
+    border-radius: 18px;
+    max-width: 85%;
+    word-break: break-word;
+    font-size: 1.5rem;
+    line-height: 1.4;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.bubble.you {
+    background: linear-gradient(135deg, #0581FE, #7EBFFF);
+    color: #fff;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+}
+.bubble.them {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    color: #111;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+    font-weight: 500;
+}
+.bubble.system {
+    background: transparent;
+    color: #9CA3AF;
+    text-align: center;
+    width: 100%;
+    border-radius: 0;
+    margin-bottom: 1.2rem;
+    font-style: italic;
+    align-self: center;
+    box-shadow: none;
 }
 
 /* Custom scrollbar for professional look */
@@ -293,7 +473,7 @@ body {
     }
     /* Navbar / header */
     .navbar {
-        height: 50px;
+        height: 100px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -313,7 +493,7 @@ body {
 
     /* Main chat container */
     .main {
-        height: calc(100% - 50px); /* fill rest of screen */
+        height: 88%;
         display: flex;
         flex-direction: column;
         padding: 0.5rem;
@@ -321,7 +501,7 @@ body {
 
     /* Conversation area */
     .conversation {
-        flex: 1; /* take all available space */
+        height: 83%;
         overflow-y: auto;
         padding: 0.5rem;
         margin-bottom: 0.5rem;
@@ -388,6 +568,34 @@ body {
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+
+    /* Ensure Stop button matches Send on small screens */
+    #stop {
+        width: 55px;
+        height: 45px; /* same as input height */
+        border-radius: 10px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.2s;
+        background-image: linear-gradient(to bottom, #C084FC, #7C3AED) !important;
+        color: #fff !important;
+    }
+
+    /* Ensure Really button matches Stop/Send on small screens */
+    #really {
+        width: 55px;
+        height: 45px; /* same as input height */
+        border-radius: 10px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.2s;
+        background-image: linear-gradient(to bottom, #C084FC, #7C3AED) !important;
+        color: #fff !important;
     }
 
     .btn:hover {
@@ -459,6 +667,20 @@ body {
         font-size: 1.4rem;
         padding: 0 1.2rem;
     }
+
+    /* Small devices: keep #stop same min-height as #send */
+    #stop {
+        min-height: 42px;
+        font-size: 1.4rem;
+        padding: 0 1.2rem;
+    }
+
+    /* Small devices: keep #really same min-height as #send */
+    #really {
+        min-height: 42px;
+        font-size: 1.4rem;
+        padding: 0 1.2rem;
+    }
 }
 
 /* Extra Small Mobile - iPhone SE etc. */
@@ -515,6 +737,20 @@ body {
     }
 
     #send {
+        min-height: 40px;
+        font-size: 1.3rem;
+        padding: 0 1rem;
+    }
+
+    /* Extra-small devices: ensure #stop matches #send */
+    #stop {
+        min-height: 40px;
+        font-size: 1.3rem;
+        padding: 0 1rem;
+    }
+
+    /* Extra-small devices: ensure #really matches #send */
+    #really {
         min-height: 40px;
         font-size: 1.3rem;
         padding: 0 1rem;

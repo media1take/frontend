@@ -11,6 +11,10 @@
     <a href="/" aria-label="Home"><img class="logo" src="/img/logo.png" alt="Logo"></a>
     <h2 class="description">Talk to strangers!</h2>
     <h2 class="online" id="onlineCount">Online Now</h2>
+    <div class="moderation" aria-hidden="false">
+      <button id="mod-block" class="mod-btn hide" title="Block user">🚫</button>
+      <button id="mod-report" class="mod-btn hide" title="Report user">⚠️</button>
+    </div>
   </section>
   <main class="main" role="main">
     <!-- LEFT: Videos stacked (remote top, local bottom) -->
@@ -42,7 +46,20 @@
       </div>
     </section>
   </main>
-  <!-- Load config and socket.io client library -->
+  <!-- Exit confirmation modal -->
+  <div id="exit-modal" class="modal hide" role="dialog" aria-hidden="true">
+    <div class="modal-backdrop" id="modal-backdrop"></div>
+    <div class="modal-panel" role="document" aria-labelledby="exit-title">
+      <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+      <h3 id="exit-title">Are you sure you want to end this chat?</h3>
+      <textarea id="exit-note" class="exit-textarea" placeholder="Really — say something (optional)"></textarea>
+      <div class="modal-actions">
+        <button id="modal-send" class="btn">Send</button>
+        <button id="modal-yes" class="btn primary">Yes</button>
+      </div>
+    </div>
+  </div>
+
   <script src="/config.js"></script>
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <!-- Load external video chat script with WebRTC and signaling logic -->

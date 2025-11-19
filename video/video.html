@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Omegle — Video Chat</title>
+  <link rel="stylesheet" href="/video/video.css" />
+</head>
+<body>
+  <section class="navbar" role="navigation" aria-label="Top navigation">
+    <a href="/" aria-label="Home"><img class="logo" src="/img/logo.png" alt="Logo"></a>
+    <h2 class="description">Talk to strangers!</h2>
+    <h2 class="online" id="onlineCount">Online Now</h2>
+  </section>
+  <main class="main" role="main">
+    <!-- LEFT: Videos stacked (remote top, local bottom) -->
+    <section class="videos" aria-label="Video area">
+      <div class="video-container" id="remoteWrap" aria-hidden="false">
+        <span class="video-label">Stranger</span>
+        <video id="remoteVideo" autoplay playsinline></video>
+      </div>
+      <div class="video-container" id="localWrap" aria-hidden="false">
+        <span class="video-label">You</span>
+        <video id="localVideo" autoplay playsinline muted></video>
+      </div>
+      <div class="status" id="status">Not connected — click Start to find a partner</div>
+      <div class="screenshot-container">
+        <button type="button" class="screenshot-btn" id="screenshot">Screenshot</button>
+      </div>
+    </section>
+    <!-- RIGHT: Chat with large input -->
+    <section class="chat-container" aria-label="Chat">
+      <div class="chat" id="chat">
+        <div class="bubble system" id="welcome">Say hi to start chatting — or press Next to find another person.</div>
+      </div>
+      <div class="composer" role="region" aria-label="Message composer">
+        <button id="startBtn" class="btn primary bottom-left-radius" aria-pressed="false">Start</button>
+        <button id="stopBtn" class="btn danger bottom-left-radius hide">Stop</button>
+        <button id="reallyBtn" class="btn danger bottom-left-radius bold hide">Really?</button>
+        <textarea id="message" class="chat-input" placeholder="Type your message here..." aria-label="Message input" disabled></textarea>
+        <button id="sendBtn" class="btn primary bottom-right-radius" disabled>Send</button>
+      </div>
+    </section>
+  </main>
+  <!-- Load config and socket.io client library -->
+  <script src="/config.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <!-- Load external video chat script with WebRTC and signaling logic -->
+  <script src="../script.js"></script>
+  <script>
+    // Better screenshot handler: diagnostics + wait for a video frame when possible
+    (function() {
+      const btn = document.getElementById('screenshot');
+      if (!btn) return;
+
+      btn.addEventListener('click', async function() {
+        btn.classList.add('clicked');
+        setTimeout(() => btn.classList.remove('clicked'), 500);
+
+        try {
+          const remote = document.getElementById('remoteVideo');
+          if (!remote) throw new Error('Remote video element not found');
+
+          // Wait until there's a usable frame if browser supports it
+          const waitForFrame = () => new Promise((resolve) => {
+            if ('requestVideoFrameCallback' in HTMLVideoElement.prototype) {
+              try {
+                remote.requestVideoFrameCallback(() => resolve());
+              } catch (e) {
+                // fallback
+                setTimeout(resolve, 100);
+              }
+            } else {
+              // If videoWidth is 0, wait a short moment
+              if ((remote.videoWidth || remote.clientWidth) === 0) {
+                let checks = 0;
+                const iv = setInterval(() => {
+                  checks++;
+                  if ((remote.videoWidth || remote.clientWidth) > 0 || checks > 10) {
+                    clearInterval(iv);
+                    resolve();
+                  }
+                }, 150);
+              } else {
+                resolve();
+              }
+            }
+          });
+
+          await waitForFrame();
+
+          const width = remote.videoWidth || remote.clientWidth || 640;
+          const height = remote.videoHeight || remote.clientHeight || 480;
+          console.log('Screenshot: video sizes', { width, height });
+
+          if (width === 0 || height === 0) {
+            throw new Error('Remote video not ready (zero dimensions)');
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+
+          // Draw current frame of the video onto the canvas
+          ctx.drawImage(remote, 0, 0, canvas.width, canvas.height);
+
+          // Convert to blob and trigger download
+          canvas.toBlob(blob => {
+            if (!blob) {
+              console.warn('Screenshot: toBlob returned null');
+              alert('Unable to capture screenshot — try again when video is visible');
+              return;
+            }
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const time = new Date().toISOString().replace(/[:.]/g, '-');
+            a.download = `Omegle-screenshot-${time}.png`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+          }, 'image/png');
+
+        } catch (err) {
+          console.error('Screenshot error:', err);
+          alert('Unable to capture screenshot. The remote video may not be available or the browser prevented capture. See console for details.');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

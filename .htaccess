@@ -1,0 +1,13 @@
+# .htaccess — rewrite requests to index.php when file/dir not found
+Options -Indexes
+RewriteEngine On
+RewriteBase /
+
+# serve existing files or directories directly
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# otherwise route everything to index.php (preserve query string)
+DirectoryIndex index.php
+RewriteRule ^ index.php [L,QSA]

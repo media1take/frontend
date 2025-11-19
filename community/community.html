@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omegle Community - Tips & Discussions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 62.5%; }
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #222;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            margin: 0;
+        }
+
+        header {
+            background: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-left {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0581FE;
+            transform: rotate(-6deg);
+            text-decoration: none;
+        }
+
+        nav a {
+            color: #0581FE;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.3s;
+            font-size: 1.4rem;
+        }
+
+        nav a:hover { opacity: 0.8; }
+
+        .main-content {
+            flex: 1;
+            max-width: 1200px;
+            margin: 2rem auto;
+            width: 100%;
+            padding: 0 1rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .post-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        }
+
+        .post-category {
+            display: inline-block;
+            background: #0581FE;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .post-title {
+            font-size: 1.8rem;
+            color: #222;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .post-content {
+            font-size: 1.5rem;
+            color: #565656;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .post-meta {
+            font-size: 1.2rem;
+            color: #999;
+            border-top: 1px solid #eee;
+            padding-top: 1rem;
+        }
+
+        footer {
+            background: rgba(0,0,0,0.8);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            font-size: 1.4rem;
+        }
+
+        footer a {
+            color: #7EBFFF;
+            text-decoration: none;
+        }
+
+        footer a:hover { text-decoration: underline; }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .header-left {
+                flex-direction: column;
+                gap: 1rem;
+                width: 100%;
+            }
+
+            nav {
+                display: flex;
+                gap: 1rem;
+                flex-wrap: wrap;
+                width: 100%;
+            }
+
+            nav a {
+                font-size: 1.2rem;
+            }
+
+            .logo-text {
+                font-size: 1.8rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .main-content {
+                padding: 0 0.5rem;
+            }
+
+            .post-card {
+                padding: 1.5rem;
+            }
+
+            .post-title {
+                font-size: 1.5rem;
+            }
+
+            .post-content {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            html { font-size: 55%; }
+
+            .post-card {
+                padding: 1rem;
+            }
+
+            .section-title {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+        <link rel="stylesheet" href="/home/Omegle.css">
+        <header class="nav" role="banner" aria-label="Main navigation">
+            <a class="brand" href="/">Omegle</a>
+            <nav class="links" role="navigation" aria-label="Primary">
+                <a href="/home">Home</a>
+                <a href="/chat">Chat</a>
+                <a href="/video">Video</a>
+                <a href="/community" class="primary community-btn">Community</a>
+                <a href="/blog" class="blog-btn">Blog</a>
+                <a href="/terms">Terms</a>
+                <a href="/privacy">Privacy</a>
+                <a href="/guidelines">Guidelines</a>
+            </nav>
+        </header>
+
+    <div class="main-content">
+        <h1 class="section-title">Community & Tips</h1>
+
+        <div class="posts-grid">
+            <!-- Tips Post 1 -->
+            <div class="post-card">
+                <span class="post-category">💡 Tips</span>
+                <h2 class="post-title">Stay Safe Online</h2>
+                <p class="post-content">
+                    Remember to keep your personal information private. Never share your real name, email, phone number, or address with strangers. 
+                    Omegle is meant for anonymous conversations!
+                </p>
+                <div class="post-meta">Last updated: Nov 15, 2025</div>
+            </div>
+
+            <!-- Tips Post 2 -->
+            <div class="post-card">
+                <span class="post-category">💬 Tips</span>
+                <h2 class="post-title">Great Conversation Starters</h2>
+                <p class="post-content">
+                    "What's your hobby?" "What's the best thing about your country?" "What's on your mind today?" 
+                    Starting with open-ended questions leads to more interesting conversations!
+                </p>
+                <div class="post-meta">Last updated: Nov 14, 2025</div>
+            </div>
+
+            <!-- Community Post 1 -->
+            <div class="post-card">
+                <span class="post-category">🌍 Community</span>
+                <h2 class="post-title">Users from Around the World</h2>
+                <p class="post-content">
+                    Our community spans across 100+ countries. Connect with people from different cultures and learn about their lives. 
+                    It's a beautiful way to understand the world better!
+                </p>
+                <div class="post-meta">Members: 50K+</div>
+            </div>
+
+            <!-- Tips Post 3 -->
+            <div class="post-card">
+                <span class="post-category">🎯 Tips</span>
+                <h2 class="post-title">Features You Should Know</h2>
+                <p class="post-content">
+                    Use text chat for quick conversations or video chat to connect face-to-face. Add interests to match with people who share your hobbies. 
+                    Try both modes and see which you prefer!
+                </p>
+                <div class="post-meta">Last updated: Nov 13, 2025</div>
+            </div>
+
+            <!-- Community Post 2 -->
+            <div class="post-card">
+                <span class="post-category">🌟 Community</span>
+                <h2 class="post-title">Your Feedback Matters</h2>
+                <p class="post-content">
+                    Have suggestions? Found a bug? Let us know! Community feedback helps us improve Omegle every day. 
+                    We're always listening to make your experience better.
+                </p>
+                <div class="post-meta">Join the discussion</div>
+            </div>
+
+            <!-- Tips Post 4 -->
+            <div class="post-card">
+                <span class="post-category">✨ Tips</span>
+                <h2 class="post-title">Make Meaningful Connections</h2>
+                <p class="post-content">
+                    Be respectful, curious, and genuine. Listen more than you talk. Many users have made lifelong friendships on Omegle. 
+                    Who knows—your next best friend might be just one click away!
+                </p>
+                <div class="post-meta">Last updated: Nov 12, 2025</div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© Omegle.uk.to • <a href="/terms">Terms of Service</a> • <a href="/privacy">Privacy Policy</a> • <a href="/guidelines">Community Guidelines</a></p>
+        <p style="margin-top: 1rem; font-size: 1.2rem;">Connect. Chat. Explore. Enjoy!</p>
+    </footer>
+
+    <script src="/config.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</body>
+</html>

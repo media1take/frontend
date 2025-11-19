@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Socket.IO Debug</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        p { margin: 5px 0; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Socket.IO Connection Debug</h1>
+    <button onclick="testConnection()">Test Connection</button>
+    <hr>
+    <div id="logs"></div>
+    
+    <script src="/config.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        const logsDiv = document.getElementById('logs');
+        let socket = null;
+        
+        function log(msg, type = 'info') {
+            console.log(msg);
+            const p = document.createElement('p');
+            p.className = type;
+            p.textContent = new Date().toLocaleTimeString() + ': ' + msg;
+            logsDiv.appendChild(p);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+        
+        function testConnection() {
+            if (socket) socket.disconnect();
+            
+            log('======= NEW TEST =======', 'info');
+            log('Page protocol: ' + location.protocol, 'info');
+            log('Page host: ' + location.host, 'info');
+            log('window.__BACKEND_URL: ' + window.__BACKEND_URL, 'info');
+            log('window.__SIGNALING_PATH: ' + window.__SIGNALING_PATH, 'info');
+            
+            setTimeout(() => {
+                log('Attempting connection with transports: websocket, polling', 'info');
+                socket = io(window.__BACKEND_URL, { 
+                    path: window.__SIGNALING_PATH,
+                    transports: ['polling', 'websocket'],
+                    reconnectionDelay: 1000,
+                    reconnection: true,
+                    upgrade: true
+                });
+                
+                socket.on('connect', () => {
+                    log('✓ Connected! Socket ID: ' + socket.id, 'success');
+                });
+                
+                socket.on('numberOfOnline', (size) => {
+                    log('✓ Online count: ' + size, 'success');
+                });
+                
+                socket.on('error', (err) => {
+                    log('✗ Error: ' + JSON.stringify(err), 'error');
+                });
+                
+                socket.on('connect_error', (err) => {
+                    log('✗ Connect error: ' + err.message, 'error');
+                    log('  Error data: ' + JSON.stringify(err), 'error');
+                });
+                
+                socket.on('disconnect', (reason) => {
+                    log('⚠ Disconnected: ' + reason, 'info');
+                });
+            }, 500);
+        }
+        
+        // Auto-test on page load
+        window.addEventListener('load', () => {
+            log('Page fully loaded', 'info');
+            testConnection();
+        });
+    </script>
+</body>
+</html>

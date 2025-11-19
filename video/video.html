@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Omegle — Video Chat</title>
+  <link rel="shortcut icon" href="/img/logo.png" type="image/x-icon">
   <link rel="stylesheet" href="/video/video.css" />
 </head>
 <body>
@@ -27,13 +28,13 @@
         <span class="video-label">You</span>
         <video id="localVideo" autoplay playsinline muted></video>
       </div>
-      <div class="status" id="status">Not connected — click Start to find a partner</div>
       <div class="screenshot-container">
         <button type="button" class="screenshot-btn" id="screenshot">Screenshot</button>
       </div>
     </section>
     <!-- RIGHT: Chat with large input -->
     <section class="chat-container" aria-label="Chat">
+      <div class="status" id="status">Not connected — click Start to find a partner</div>
       <div class="chat" id="chat">
         <div class="bubble system" id="welcome">Say hi to start chatting — or press Next to find another person.</div>
       </div>

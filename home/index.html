@@ -9,116 +9,131 @@
     <link rel="shortcut icon" href="/img/logo.png" type="image/x-icon">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header" role="banner" aria-label="Top header">
-        <div class="header-left">
-            <a href="/" class="brand logo">
-                <img src="/img/omgelelogocroped.png" alt="Omegle Logo">
-            </a>
-            <div class="description">
-                <img src="/img/tagline.png" alt="Talk to Strangers">
-            </div>
+    <style>
+      /* Small page-specific overrides to center content and add an inclined title */
+      .site-container{max-width:1100px;margin:0 auto;padding:1.2rem;}
+      header.site-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 0}
+      .brand{display:flex;align-items:center;gap:1rem;text-decoration:none}
+      .brand img{height:56px;max-height:64px;width:auto}
+      .site-title{font-weight:800;font-size:2.4rem;line-height:1;color:#0b5cff;display:inline-block;transform:rotate(-6deg);transform-origin:left center}
+      nav.site-nav{display:flex;gap:1rem;align-items:center}
+      nav.site-nav a{color:#111;text-decoration:none;padding:.5rem .8rem;border-radius:8px}
+      nav.site-nav a:hover{background:rgba(5,129,254,0.06)}
+      .hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:2.2rem 1rem}
+      .hero p.lead{font-size:1.25rem;color:#334155;max-width:70ch;margin:0.6rem 0}
+      .hero .actions{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-top:1.25rem}
+      .btn{display:inline-flex;align-items:center;justify-content:center;padding:.9rem 1.15rem;border-radius:10px;border:none;cursor:pointer;font-weight:600}
+      .btn.primary{background:linear-gradient(135deg,#7EBFFF,#0581FE);color:#fff}
+      .btn.ghost{background:#fff;border:1px solid rgba(0,0,0,0.06)}
+      .info-box{background:#fff;border-radius:12px;padding:1rem;margin-top:1rem;max-width:900px;box-shadow:0 6px 16px rgba(2,6,23,0.06)}
+      .interest-input{width:100%;max-width:420px;padding:.9rem 1rem;border:1px solid rgba(0,0,0,0.08);border-radius:8px;font-size:1.05rem}
+      footer.site-footer{padding:1.2rem 0;color:#64748B;text-align:center}
+      @media (min-width:900px){.brand img{height:72px}.site-title{font-size:3.2rem}}
+
+      /* Online badge sizing */
+      .online-badge{display:flex;flex-direction:column;align-items:flex-end;font-size:1rem;color:#10B981}
+      .online-badge strong{font-size:2.6rem;color:#0b5cff;line-height:1;font-weight:800}
+      .online-badge small{font-size:0.95rem;color:#64748B}
+
+      /* Mobile responsiveness: stack header, make CTAs full width */
+      @media (max-width: 900px) {
+        .site-container{padding:1rem}
+        .site-title{font-size:2rem}
+        .brand img{height:56px}
+      }
+
+      @media (max-width: 700px) {
+        header.site-header{flex-direction:column;align-items:center;gap:.6rem;padding:.8rem 0}
+        nav.site-nav{width:100%;display:flex;justify-content:center;gap:.5rem;flex-wrap:wrap}
+        .online-badge{margin-left:0;text-align:center;align-items:center}
+        .site-title{font-size:1.6rem;transform:rotate(-4deg)}
+        .online-badge strong{font-size:2rem}
+        .online-badge small{font-size:0.85rem}
+        .brand{justify-content:center}
+        .hero{padding:1.1rem .8rem}
+        .hero p.lead{font-size:1.05rem;max-width:54ch}
+        .hero .actions{flex-direction:column;align-items:stretch;width:100%}
+        .btn{width:100%;max-width:420px}
+        .info-box{padding:.9rem;margin-top:.8rem}
+        .interest-input{max-width:100%}
+        img{max-width:100%;height:auto}
+      }
+
+      /* Menu styles */
+      .menu-toggle{background:transparent;border:1px solid rgba(0,0,0,0.06);padding:.45rem .6rem;border-radius:8px;cursor:pointer;font-size:1.1rem}
+      .menu-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);opacity:0;visibility:hidden;transition:opacity .2s;z-index:1200}
+      .menu-backdrop.open{opacity:1;visibility:visible}
+      .site-menu{position:fixed;left:0;top:0;height:100%;width:300px;max-width:80%;background:#fff;box-shadow:2px 0 24px rgba(2,6,23,0.12);transform:translateX(-110%);transition:transform .28s cubic-bezier(.2,.9,.2,1);z-index:1300}
+      .site-menu.open{transform:translateX(0)}
+      .site-menu-inner{padding:1.2rem}
+      .menu-close{background:transparent;border:none;font-size:2.2rem;position:absolute;right:0.7rem;top:0.4rem;cursor:pointer}
+      .menu-list{list-style:none;padding:1rem 0;margin:2.6rem 0 0}
+      .menu-item{display:block;padding:.9rem 1rem;border-radius:8px;color:#0b1726;text-decoration:none;font-weight:600}
+      .menu-item:hover{background:rgba(5,129,254,0.06)}
+
+      @media (max-width:700px){
+        .site-menu{width:100%;max-width:100%}
+      }
+    </style>
+
+    <div class="site-container">
+      <!-- Menu backdrop and slide-out menu -->
+      <div id="menuBackdrop" class="menu-backdrop" hidden></div>
+      <nav id="siteMenu" class="site-menu" aria-hidden="true" role="menu" aria-label="Main menu">
+        <div class="site-menu-inner">
+          <button id="menuClose" class="menu-close" aria-label="Close menu">×</button>
+          <ul class="menu-list">
+            <li><a class="menu-item" role="menuitem" href="/chat">Text chat</a></li>
+            <li><a class="menu-item" role="menuitem" href="/video">Video chat</a></li>
+            <li><a class="menu-item" role="menuitem" href="/community">Community</a></li>
+            <li><a class="menu-item" role="menuitem" href="/blog">Blog</a></li>
+            <li><a class="menu-item" role="menuitem" href="/terms">Terms</a></li>
+            <li><a class="menu-item" role="menuitem" href="/privacy">Privacy</a></li>
+            <li><a class="menu-item" role="menuitem" href="/guidelines">Community Guidelines</a></li>
+          </ul>
         </div>
-        <div class="header-right">
-            <div class="social-links">
-                <a href="/community" title="Visit our community">
-                    <img src="/img/fbsharebtn.png" alt="Community">
-                </a>
-                <a href="/community" title="Visit our community">
-                    <img src="/img/tweetbtn.png" alt="Community">
-                </a>
-            </div>
-            <a href="/community" class="nav-link">Community</a>
-            <a href="/blog" class="nav-link">Blog</a>
-            <select id="langSelect">
-                <option value="en">English</option>
-                <option value="hi">हिंदी (Hindi)</option>
-                <option value="bn">বাংলা (Bengali)</option>
-                <option value="ta">தமிழ் (Tamil)</option>
-                <option value="te">తెలుగు (Telugu)</option>
-                <option value="mr">मराठी (Marathi)</option>
-                <option value="gu">ગુજરાતી (Gujarati)</option>
-                <option value="kn">ಕನ್ನಡ (Kannada)</option>
-                <option value="ml">മലയാളം (Malayalam)</option>
-                <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
-            </select>
-            <div class="online-badge">
-                <strong id="onlineCount">0</strong>
-                <small>online now</small>
-            </div>
+      </nav>
+      <header class="site-header" role="banner" aria-label="Top header">
+        <a href="/" class="brand">
+          <img src="/img/omgelelogocroped.png" alt="Omegle logo">
+          <span class="site-title">Talk To Strangers</span>
+        </a>
+        <nav class="site-nav" role="navigation" aria-label="Primary">
+        </nav>
+        <!-- Online count badge (updated by homepage socket) -->
+        <div class="online-badge" style="margin-left:1rem;text-align:right;display:flex;flex-direction:column;align-items:flex-end">
+          <strong id="onlineCount">0</strong>
+          <small style="font-size:0.85rem;color:#64748B">online now</small>
         </div>
-    </header>
+      </header>
 
-    <!-- Main Content -->
-    <div class="remaining">
-            <div class="midbox">
-                <div class="topmid">
-                    <p><strong>You don't need an app to use Omegle on your phone or tablet! The web site works great on mobile.</strong></p>
-                </div>
-                <div class="photo">
-                    <img src="/img/standwithhk.jpeg" alt="Stand with Hong Kong">
-                </div>
-                <div class="lefttophoto">
-                    <p>Omegle is a great way to meet new friends,<br> even while practicing social distancing. When you use<br> Omegle, you are paired randomly with another person to <br>talk one-on-one. If you prefer, you can add your interests<br> and you’ll be randomly paired with someone who selected<br> some of the same interests.</p>
+      <main role="main">
+        <section class="hero" aria-labelledby="hero-title">
+          <h1 id="hero-title" class="site-title" style="transform:rotate(-6deg);">Meet strangers. Have fun.</h1>
+          <p class="lead">Use Omegle from any browser — no app required. Chat anonymously, add interests to match, and stop anytime.</p>
 
-                </div>
-                <div class="downmid">
-                    <p>To help you stay safe, chats are anonymous unless you tell someone who you are (not <br>recommended!), and you can stop a chat at any time. See our <a href="/terms" target="_blank">Terms of Service</a> and <a href="/guidelines" target="_blank">Community <br>Guidelines</a> for more info about the do's and don'ts when using Omegle. Omegle video chat is moderated <br>but no moderation is perfect. Users are solely responsible for their behavior while using Omegle.<br><br>
+          <div class="actions">
+            <a class="btn primary" href="/video" title="Start video chat">Start Video</a>
+            <a class="btn ghost" href="/chat" title="Start text chat">Start Text</a>
+          </div>
 
-                        <strong>You must be 18+ or 13+ with parental permission and supervision to use Omegle.</strong> See our<br> <a href="/terms" target="_blank">Terms of Service</a> for more info. Parental control protections that may assist parents are commercially<br> available and you can find more info at <a href="https://www.connectsafely.org/controls/" target="_blank">https://www.connectsafely.org/controls/</a> as well as other sites.<br><br>
+          <div class="info-box" aria-live="polite">
+            <p><strong>Video is monitored.</strong> Keep chats appropriate. You must be 18+ (or 13+ with parental permission) — see our <a href="/terms" target="_blank">Terms</a> and <a href="/guidelines" target="_blank">Community Guidelines</a>.</p>
 
-                        Please leave Omegle and visit an <span class="adult-note">adult site</span> instead if that's what you're looking for, and you are 18 or older.</p>
-
-                </div>
-                <div class="bluebox">
-                    <h2>Video is monitored. Keep it clean <img src="/img/exclamationog.png" alt="Warning"></h2>
-                </div>
-            <div class="middown">
-               <div class="interest">
-                <form action="">
-                   
-                <table class="talkabout">
-                    <tr>
-                        <td><label class="about">What do you wanna talk about?</label></td>
-                    </tr>
-                    <tr>
-                        <td id="talkbox"><input type="text" style="line-height: 48px;width: 339px; height: 40px;border-radius: 5px; text-align: center;font-size: larger; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;" placeholder="Add your interest(optional)"></td>
-                    </tr>
-                   
-                </table>
-               </form>
-               </div>
-                <div class="chating">
-                    <p style="padding-left: 136px;">Start chatting:</p>
-                    <div class="textimg">
-                        <a href="/chat" title="Start text chat">
-                            <img src="/img/textbtn.png" height="48" width="124" alt="Text chat">
-                        </a>
-                    </div>
-                    <div class="ortext">
-                        <p style="padding-left: 38px;padding-top: 13px;"><strong>or</strong></p>
-                    </div>
-                    <div class="videoimg">
-                        <a href="/video" title="Start video chat">
-                            <img src="/img/videobtn-enabled.png" height="48" width="124" alt="Video chat">
-                        </a>
-                    </div>
-                    
-               </div>
-               <div class="college">
-                      <div class="playbutton">
-                          <img src="/img/blue-square-play-button.png" alt="Play" style="height: 25px;">
-                      </div>
-                 <div class="stdchat">
-                    <p><strong>College student</strong> chat</p>
-                   
-                 </div>
-                      <div class="unmoded">
-                          <img src="/img/umoded.png" alt="Unmoderated" style="height: 25px;">
-                      </div>
-
-               </div>
+            <div style="margin-top:.9rem;display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;align-items:center">
+              <input class="interest-input" type="text" placeholder="Add an interest (optional)">
+              <a class="btn ghost" href="/community">Community</a>
             </div>
+          </div>
+        </section>
+
+        <section aria-label="Additional info" style="margin-top:1.2rem;display:flex;gap:1rem;flex-wrap:wrap;justify-content:center">
+          <img src="/img/standwithhk.jpeg" alt="Stand with Hong Kong" style="max-width:320px;border-radius:8px;box-shadow:0 6px 18px rgba(2,6,23,0.06)">
+          <div style="max-width:48ch">
+            <p>Omegle pairs you randomly with another person to talk one‑on‑one. Add interests to increase chances of a topic match. Chats are anonymous unless you share personal info.</p>
+          </div>
+        </section>
+      </main>
 
     <!-- Footer -->
     <footer class="site-footer" role="contentinfo">
@@ -135,6 +150,48 @@
     <!-- Socket.IO and Config -->
     <script src="/config.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+      // Menu toggle behavior
+      (function(){
+        const toggleButton = document.createElement('button');
+        toggleButton.id = 'menuToggle';
+        toggleButton.className = 'menu-toggle';
+        toggleButton.setAttribute('aria-expanded','false');
+        toggleButton.setAttribute('aria-controls','siteMenu');
+        toggleButton.innerHTML = '☰ Menu';
+
+        // insert toggle button before nav for accessibility
+        const header = document.querySelector('header.site-header');
+        if(header){
+          header.insertBefore(toggleButton, header.querySelector('.site-nav'));
+        }
+
+        const menu = document.getElementById('siteMenu');
+        const backdrop = document.getElementById('menuBackdrop');
+        const closeBtn = document.getElementById('menuClose');
+
+        function openMenu(){
+          if(!menu) return;
+          menu.classList.add('open');
+          backdrop.hidden = false; backdrop.classList.add('open');
+          menu.setAttribute('aria-hidden','false');
+          toggleButton.setAttribute('aria-expanded','true');
+        }
+        function closeMenu(){
+          if(!menu) return;
+          menu.classList.remove('open');
+          backdrop.classList.remove('open');
+          setTimeout(()=>{ if(backdrop) backdrop.hidden = true; }, 300);
+          menu.setAttribute('aria-hidden','true');
+          toggleButton.setAttribute('aria-expanded','false');
+        }
+
+        if(toggleButton){ toggleButton.addEventListener('click', openMenu); }
+        if(backdrop){ backdrop.addEventListener('click', closeMenu); }
+        if(closeBtn){ closeBtn.addEventListener('click', closeMenu); }
+        document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeMenu(); });
+      })();
+    </script>
     <script>
         // Initialize socket connection
         function initSocket() {

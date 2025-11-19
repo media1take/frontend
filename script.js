@@ -7,6 +7,7 @@ let localStream = null;
 let room = null;
 let isInitiator = false;
 let isConnected = false;
+let _connectTimeout = null;
 
 // Socket initialization
 function initSocket() {
@@ -29,6 +30,31 @@ function initSocket() {
     
     setupSocketListeners();
     setupEventListeners();
+
+    // If we cannot establish a socket connection within a short window,
+    // show a friendly status message so users know the server may be unreachable.
+    if (_connectTimeout) clearTimeout(_connectTimeout);
+    _connectTimeout = setTimeout(() => {
+      if (!socket || !socket.connected) {
+        console.warn('[video] Socket connection timeout');
+        if (statusEl) {
+          setStatus('Unable to reach signaling server — please check your network or try again later.' +
+            ' <button id="retryConnect" class="btn">Retry</button>', 0, true);
+          const retry = document.getElementById('retryConnect');
+          if (retry) {
+            retry.addEventListener('click', () => {
+              if (socket && socket.connect) {
+                try { socket.connect(); } catch (e) { console.warn('[video] socket.connect failed', e); }
+              } else {
+                initSocket();
+              }
+              // show immediate feedback
+              setStatus('Retrying connection...', 2000);
+            });
+          }
+        }
+      }
+    }, 6000);
 }
 
 // Auto-init when DOM is ready
@@ -58,6 +84,27 @@ const blockBtn = document.getElementById('mod-block');
 const reportBtn = document.getElementById('mod-report');
 let partnerId = null;
 
+// Status helper: sets status text (or HTML) and optionally auto-hides after a timeout
+let _statusHideTimer = null;
+function setStatus(text, autoHideMs, allowHTML = false) {
+  if (!statusEl) return;
+  if (_statusHideTimer) { clearTimeout(_statusHideTimer); _statusHideTimer = null; }
+  if (allowHTML) statusEl.innerHTML = text; else statusEl.textContent = text;
+  statusEl.classList.remove('hide');
+  if (typeof autoHideMs === 'number' && autoHideMs > 0) {
+    _statusHideTimer = setTimeout(() => {
+      if (statusEl) statusEl.classList.add('hide');
+      _statusHideTimer = null;
+    }, autoHideMs);
+  }
+}
+
+function hideStatus() {
+  if (!statusEl) return;
+  if (_statusHideTimer) { clearTimeout(_statusHideTimer); _statusHideTimer = null; }
+  statusEl.classList.add('hide');
+}
+
 // Start local video stream
 async function startLocal() {
   try {
@@ -69,7 +116,7 @@ async function startLocal() {
     console.log('[video] Local stream started');
   } catch (err) {
     console.error('[video] Error accessing media:', err);
-    if (statusEl) statusEl.textContent = 'Error: Cannot access camera/microphone. ' + err.message;
+      setStatus('Error: Cannot access camera/microphone. ' + err.message, 0);
   }
 }
 
@@ -110,7 +157,7 @@ function createPeerConnection() {
     console.log('[video] Connection state:', pc.connectionState);
     if (pc.connectionState === 'failed') {
       console.error('[video] PeerConnection failed');
-      if (statusEl) statusEl.textContent = 'Connection failed. Click Next to try again.';
+      setStatus('Connection failed. Click Next to try again.', 0);
     }
   };
 }
@@ -119,15 +166,33 @@ function createPeerConnection() {
 function setupSocketListeners() {
   socket.on('connect', () => {
     console.log('[video] Connected to backend:', socket.id);
-    if (statusEl) statusEl.textContent = 'Connected. Click Start to find a stranger.';
+    if (_connectTimeout) { clearTimeout(_connectTimeout); _connectTimeout = null; }
+    setStatus('Connected. Click Start to find a stranger.', 3500);
   });
 
   socket.on('error', (err) => {
     console.error('[video] Socket error:', err);
+    setStatus('Socket error: ' + (err && err.message ? err.message : String(err)), 0);
   });
 
   socket.on('connect_error', (err) => {
     console.error('[video] Socket connect_error:', err);
+    setStatus('Connection error: ' + (err && err.message ? err.message : String(err)), 0);
+  });
+
+  socket.on('reconnect_attempt', (n) => {
+    console.log('[video] Reconnect attempt', n);
+    setStatus('Reconnecting...', 0);
+  });
+
+  socket.on('reconnect_error', (err) => {
+    console.error('[video] Reconnect error', err);
+    setStatus('Reconnect error: ' + (err && err.message ? err.message : String(err)), 0);
+  });
+
+  socket.on('reconnect_failed', () => {
+    console.error('[video] Reconnect failed');
+    setStatus('Reconnect failed — please check your network or try again.', 0);
   });
 
   socket.on('numberOfOnline', (size) => {
@@ -140,7 +205,7 @@ function setupSocketListeners() {
 
   socket.on('waiting', () => {
     console.log('[video] Waiting for another user...');
-    if (statusEl) statusEl.textContent = 'Searching for a stranger...';
+    setStatus('Searching for a stranger...', 0);
   });
 
   socket.on('matched', async (data) => {
@@ -149,7 +214,8 @@ function setupSocketListeners() {
     isInitiator = data.initiator;
     isConnected = true;
     
-    if (statusEl) statusEl.textContent = 'Connected! Starting video...';
+    // Briefly show connected status and then auto-hide after a few seconds
+    setStatus('Connected! Starting video...', 3500);
     
     createPeerConnection();
 
@@ -210,14 +276,14 @@ function setupSocketListeners() {
 
   socket.on('strangerDisconnected', (msg) => {
     console.log('[video] Stranger disconnected:', msg);
-    if (statusEl) statusEl.textContent = msg;
+    setStatus(msg, 0);
     addSystemMessage(msg);
     resetVideoChat();
   });
 
   socket.on('goodBye', (msg) => {
     console.log('[video] Good bye:', msg);
-    if (statusEl) statusEl.textContent = msg;
+    setStatus(msg, 0);
     addSystemMessage(msg);
     resetVideoChat();
   });
@@ -257,7 +323,7 @@ function setupEventListeners() {
         // Immediately show Stop button (red) while searching, like classic Omegle UI
         if (startBtn) startBtn.style.display = 'none';
         if (stopBtn) { stopBtn.style.display = 'block'; stopBtn.classList.add('danger'); }
-        if (statusEl) statusEl.textContent = 'Searching for a stranger...';
+        setStatus('Searching for a stranger...', 0);
 
         if (!localStream) {
           await startLocal();
@@ -542,7 +608,7 @@ function resetVideoChat() {
   room = null;
   isInitiator = false;
   isConnected = false;
-  if (statusEl) statusEl.textContent = 'Stopped. Click Start to find another stranger.';
+  setStatus('Stopped. Click Start to find another stranger.', 0);
   // remove typing indicator if present
   hideTypingIndicator();
 }
@@ -553,7 +619,7 @@ window.addEventListener('load', async () => {
   if (!localStream) {
     await startLocal();
   }
-  if (statusEl) statusEl.textContent = 'Ready. Click Start to find a stranger.';
+  setStatus('Ready. Click Start to find a stranger.', 3000);
 });
 
 // Cleanup on page unload
